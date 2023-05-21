@@ -1,5 +1,5 @@
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
-  name: ips-pool-advertisement
+  name: ip-pool-advertisement
   namespace: metallb-system
