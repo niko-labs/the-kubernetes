@@ -1,7 +1,4 @@
-# Iniciando com Kubernetes
-
-## Objetivo
-Termos um ambiente de desenvolvimento para testar e aprender a realizar deploy de aplicações com Kubernetes.
+# Do ZERO o Servidor em Casa com Kubernetes
 
 ---
 ## O que iremos utilizar?
@@ -60,7 +57,7 @@ Considere que os endereços dos hosts são:
 3. - MINI PC: 192.168.3.101
 > **OBS: Atualize o arquivo hosts.yaml com os endereços dos seus servidores e seus respectivos usuários e senhas.**
 ```yaml
-# ./scripts/ANSIBLE/hosts.yaml
+# hosts.yaml
 MASTER:
   hosts:
     rp4:
@@ -95,7 +92,7 @@ SERVERS:
 ## 4. Passo - Configuração do Playbook do Ansible para instalação do K3S 
 No computador auxiliar criaremos o seguinte playbook de instalação do K3S:
 ```yaml
-# ./ANSIBLE/k3s.install.yaml
+# k3s.install.yaml
 - name: Instalando K3S no MASTER
   hosts: MASTER
   vars:
@@ -154,7 +151,7 @@ No computador auxiliar criaremos o seguinte playbook de instalação do K3S:
 ## 5. Passo - Reiniciando os servidores
 Após a instalação do K3S, reinicie os servidores para que o K3S possa iniciar os serviços corretamente validar se os serviços estão iniciando corretamente.
 ```yaml
-# ./scripts/ANSIBLE/reboot.yaml
+# reboot.yaml
 - name: REBOOT ALL
   hosts: SERVERS
   tasks:
@@ -203,6 +200,7 @@ source ~/.bashrc
 ansible-playbook -i hosts.yaml k3s.uninstall.yaml
 ```
 ![Uninstall](/assets/k3s.uninstall.gif)
+
 ---
 # Ajustes Pós Instalação
 ## 1. Passo - Configurando o MetalLB
@@ -215,36 +213,38 @@ Para instalar o MetalLB, execute o comando abaixo:
 ```bash
 k3s apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml
 ```
-
+![Install](/assets/metallb.install.gif)
 ### 1.2 MetalLB - Criando o secret para o memberlist
 ```bash
 k3s create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 ```
+![Create](/assets/metallb.memberlist.secret.gif)
 
 ### 1.3 MetalLB - Criando o IP Pool
-Para que serve o IP Pool?
-O IP Pool é um range de IPs que o MetalLB irá utilizar para provisionar os LoadBalancers.
+Será criado um IP Pool com o range de IPs de 200 a 220, ou seja, o MetalLB irá utilizar os IPs de 200 a 220 para provisionar os LoadBalancers.
 
 Abaixo um exemplo de IP Pool:
 ```yaml
-# ./scripts/K3S/metallb.IPAddressPools.yaml
+# metallb.IPAddressPools.yaml
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
-  name: ips-pool
+  name: ip-pool
   namespace: metallb-system
 spec:
   addresses:
     - 192.168.3.200-192.168.3.220
 ```
 
-### 1.4 MetalLB - Aplicando o IP Pool
 Aplicando o IP Pool.
 ```bash
 k3s apply -f metallb.IPAddressPools.yaml
 ```
+![IPPool](/assets/metallb.ippool.gif)
 
-### 1.5 MetalLB - Criando o Anuncio da Camada L2
+
+### 1.5 MetalLB - Criando o Anúncio da Camada L2
+No modo da camada 2, um ***NODE*** assume a responsabilidade de anunciar um serviço para a rede local. Do ponto de vista da rede, simplesmente parece que aquela máquina tem vários endereços IP atribuídos à sua interface de rede.
 ```yaml
 apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
@@ -253,11 +253,11 @@ metadata:
   namespace: metallb-system
 ```
 
-### 1.6 MetalLB - Aplicando o Anuncio da Camada L2
 Aplicando o Anuncio da Camada L2.
 ```bash
 k3s apply -f metallb.L2Advertisement.yaml
 ```
+![L2Advertisement](/assets/metallb.l2advertisement.gif)
 
 
 ---
