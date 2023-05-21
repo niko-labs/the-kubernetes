@@ -1,0 +1,30 @@
+- name: UNISTALLING K3S - MASTER
+  hosts: MASTER
+  tasks:
+    - name: -> MASTER - Mata o Processo do K3S
+      shell: |
+        k3s-killall.sh 
+      register: k3s_killall
+      ignore_errors: yes
+
+    - name: -> MASTER - Remove o K3S
+      shell: |
+        k3s-uninstall.sh
+      register: k3s_uninstall
+      ignore_errors: yes
+
+
+- name: UNISTALLING K3S - NODES
+  hosts: NODES
+  tasks:
+    - name: -> NODES - Mata o Processo do K3S
+      shell: |
+        k3s-killall.sh 
+      register: k3s_killall
+      ignore_errors: yes
+
+    - name: -> NODES - Remove o K3S
+      shell: |
+        k3s-agent-uninstall.sh
+      register: k3s_uninstall
+      ignore_errors: yes

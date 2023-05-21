@@ -1,0 +1,13 @@
+- name: REBOOT ALL
+  hosts: SERVERS
+  tasks:
+    - name: -> REBOOT
+      shell: |
+        reboot now
+      become: yes
+      become_user: root
+      register: reboot
+      ignore_errors: no
+
+
+# ansible-playbook -i hosts.yaml reboot-servers.yaml 

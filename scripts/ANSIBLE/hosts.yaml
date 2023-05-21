@@ -1,0 +1,26 @@
+MASTER:
+  hosts:
+    rp4-01:
+      ansible_host: 192.168.3.102
+      ansible_user: root
+      ansible_ssh_pass: dietpi
+      ansible_become: yes
+
+NODES:
+  hosts:
+    rp4-02:
+      ansible_host: 192.168.3.100
+      ansible_user: root
+      ansible_ssh_pass: dietpi
+      ansible_become: yes
+
+    minipc:
+      ansible_host: 192.168.3.101
+      ansible_user: root
+      ansible_ssh_pass: root
+      ansible_become: yes
+
+SERVERS:
+  children:
+    MASTER:
+    NODES:

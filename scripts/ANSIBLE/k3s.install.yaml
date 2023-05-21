@@ -1,0 +1,41 @@
+- name: Instalando K3S no MASTER
+  hosts: MASTER
+  vars:
+    MASTER_HOST: '192.168.3.102'
+  tasks:
+    - name: -> MASTER - Instalando o K3S
+      shell: |
+        curl -sfL https://get.k3s.io | sh -s - \
+        --write-kubeconfig-mode 644 \ 
+        --disable servicelb,traefik,metrics-server \ 
+        --token master-password \
+        --node-taint CriticalAddonsOnly=true:NoExecute \
+        --bind-address "{{ MASTER_HOST }}" \
+        --node-name MASTER
+      register: k3s_install
+      ignore_errors: no
+
+    - name: -> MASTER - Acessar o arquivo de configuração do K3S
+      shell: cat /etc/rancher/k3s/k3s.yaml
+      register: k3s_cfg
+      ignore_errors: no
+
+    - name: -> MASTER - Copiar o arquivo de configuração do K3S
+      delegate_to: localhost
+      copy:
+        content: "{{ k3s_cfg.stdout }}" 
+        dest: "{{ playbook_dir }}/k3s.cfg.yaml"
+      ignore_errors: no
+    
+- name: NODES - Instalando K3S nos NODES
+  hosts: NODES
+  vars:
+    MASTER_HOST: '192.168.3.102'
+  tasks:
+    - name: -> NODE - INSTALL K3S
+      shell: |
+        curl -sfL https://get.k3s.io | \
+        K3S_URL="https://{{ MASTER_HOST }}:6443" \
+        K3S_TOKEN=master-password \
+        K3S_NODE_NAME=NODE-{{inventory_hostname.upper()}} \
+        sh -
