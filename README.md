@@ -260,7 +260,6 @@ k3s apply -f metallb.L2Advertisement.yaml
 ![L2Advertisement](/assets/metallb/metallb.l2advertisement.gif)
 
 
----
 ### 1.6 MetalLB - Validando a instalação
 Para validar a instalação do MetalLB, execute o comando abaixo:
 ```bash
