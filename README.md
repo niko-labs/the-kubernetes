@@ -141,7 +141,7 @@ No computador auxiliar criaremos o seguinte playbook de instalação do K3S:
 > ansible-playbook -i hosts.yaml k3s.install.yaml
 > ```
 
-![Install](/assets/k3s.install.gif)
+![Install](/assets/k3s/k3s.install.gif)
 
 - **Esse processo pode demorar alguns minutos, pois o K3S irá baixar os binários e instalar os componentes necessários em todos os servidores.**
 
@@ -180,7 +180,7 @@ export KUBECONFIG=$PWD/k3s.cfg.yaml
 # verificando os nodes
 kubectl get nodes
 ```
-![Validando](/assets/k3s.validando.gif)
+![Validando](/assets/k3s/k3s.validando.gif)
 > **OBS: Caso os nodes não estejam com o status Ready, verifique os logs do K3S para identificar o problema ou se ainda estão iniciando.**
 
 ## 7. Passo - Adicionando o comando k3s no bashrc ou zshrc
@@ -193,13 +193,13 @@ Após adicionar o alias, execute o comando abaixo para carregar o arquivo de con
 ```bash
 source ~/.bashrc
 ```
-![Alias](/assets/k3s.alias.gif))
+![Alias](/assets/k3s/k3s.alias.gif)
 
 ## 8. Passo - `Opcional` Removendo o K3S
 ```bash
 ansible-playbook -i hosts.yaml k3s.uninstall.yaml
 ```
-![Uninstall](/assets/k3s.uninstall.gif)
+![Uninstall](/assets/k3s/k3s.uninstall.gif)
 
 ---
 # Ajustes Pós Instalação
@@ -213,12 +213,12 @@ Para instalar o MetalLB, execute o comando abaixo:
 ```bash
 k3s apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml
 ```
-![Install](/assets/metallb.install.gif)
+![Install](/assets/metallb/metallb.install.gif)
 ### 1.2 MetalLB - Criando o secret para o memberlist
 ```bash
 k3s create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 ```
-![Create](/assets/metallb.memberlist.secret.gif)
+![Create](/assets/metallb/metallb.memberlist.secret.gif)
 
 ### 1.3 MetalLB - Criando o IP Pool
 Será criado um IP Pool com o range de IPs de 200 a 220, ou seja, o MetalLB irá utilizar os IPs de 200 a 220 para provisionar os LoadBalancers.
@@ -240,7 +240,7 @@ Aplicando o IP Pool.
 ```bash
 k3s apply -f metallb.IPAddressPools.yaml
 ```
-![IPPool](/assets/metallb.ippool.gif)
+![IPPool](/assets/metallb/metallb.ippool.gif)
 
 
 ### 1.5 MetalLB - Criando o Anúncio da Camada L2
@@ -257,11 +257,52 @@ Aplicando o Anuncio da Camada L2.
 ```bash
 k3s apply -f metallb.L2Advertisement.yaml
 ```
-![L2Advertisement](/assets/metallb.l2advertisement.gif)
+![L2Advertisement](/assets/metallb/metallb.l2advertisement.gif)
 
 
 ---
-## 2. Passo - Configurando o Ingress Controller
+### 1.6 MetalLB - Validando a instalação
+Para validar a instalação do MetalLB, execute o comando abaixo:
+```bash
+k3s get pods -n metallb-system
+```
+Os pods do MetalLB devem estar com o status Running.
+
+
+---
+## 2. Passo - Configurando o Lens
+Para que serve o Lens?
+O Lens é uma ferramenta para gerenciamento de clusters Kubernetes, que permite a visualização de todos os recursos do cluster, além de permitir a execução de comandos e a criação de recursos.
+
+### 2.1 Lens - Instalação
+Para instalar o Lens, acesso o site https://k8slens.dev/ e baixe a versão para o seu sistema operacional.
+
+### 2.2 Lens - Configuração
+#### 2.2.1 Iniciando o Lens
+![Lens](/assets/lens/lens.1.png)
+
+#### 2.2.2 Acessando o Catalog
+![Lens](/assets/lens/lens.2.png)
+
+#### 2.2.3 Adicionando o Cluster
+![Lens](/assets/lens/lens.3.png)
+
+#### 2.2.4 Selecionando o tipo do arquivo de configuração
+![Lens](/assets/lens/lens.4.png)
+
+#### 2.2.5 Adicionando a Configuração do Cluster
+Adicione o arquivo de configuração do K3S gerado pelo playbook.
+![Lens](/assets/lens/lens.5.png)
+
+#### 2.2.6 Validando a conexão com o Cluster
+![Lens](/assets/lens/lens.6.png)
+
+#### 2.2.7 Acessando os recursos do Cluster
+![Lens](/assets/lens/lens.7.png)
+
+
+---
+## 3. Passo - Configurando o Ingress Controller
 Para que serve o Ingress Controller?
 O Ingress Controller é um controlador de Ingress, que é um recurso do Kubernetes que permite a configuração de regras de roteamento de tráfego para os serviços que estão rodando dentro do cluster.
 
