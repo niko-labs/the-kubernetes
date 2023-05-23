@@ -1,0 +1,49 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: internal-tools
+  name: kuma-dpl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: kuma-dpl
+  template:
+    metadata:
+      labels:
+        name: kuma-dpl
+    spec:
+      containers:
+        - name: kuma-container
+          image: louislam/uptime-kuma:1
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "64m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          ports:
+            - containerPort: 3001
+              protocol: TCP
+              name: http
+              hostPort: 3001
+
+          volumeMounts:
+            - name: kuma-pv-claim
+              mountPath: /app/data
+      volumes:
+        - name: kuma-pv-claim
+          persistentVolumeClaim:
+            claimName: kuma-pv-claim
+      terminationGracePeriodSeconds: 10
+      restartPolicy: Always
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - node-minipc

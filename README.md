@@ -195,6 +195,31 @@ source ~/.bashrc
 ```
 ![Alias](/assets/k3s/k3s.alias.gif)
 
+## 8. Passo - Configurando o Metrics Server
+Para que serve o Metrics Server?
+O Metrics Server é um componente do Kubernetes que coleta métricas de uso de recursos de cada nó e pod do cluster, permitindo que o Kubernetes possa escalar os pods de acordo com a necessidade.
+
+### 8.1 Metrics Server - Instalação
+Baixe o arquivo de instalação do Metrics Server:
+```bash
+curl -LO https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
+
+### 8.2 Metrics Server - Configuração
+Altere o arquivo de instalação do Metrics Server, adicionando no tipo `Kind:Deployments` as seguintes linhas no spec do container:
+```yaml
+        command:
+        - /metrics-server
+        - --kubelet-insecure-tls
+        - --kubelet-preferred-address-types=InternalIP
+```
+- Antes
+![Metrics Server](/assets/metrics-server/antes.png)
+
+- Depois
+![Metrics Server](/assets/metrics-server/depois.png)
+
+
 ## 8. Passo - `Opcional` Removendo o K3S
 ```bash
 ansible-playbook -i hosts.yaml k3s.uninstall.yaml
@@ -301,13 +326,15 @@ Adicione o arquivo de configuração do K3S gerado pelo playbook.
 
 
 ---
-## 3. Passo - Configurando o Ingress Controller
-Para que serve o Ingress Controller?
-O Ingress Controller é um controlador de Ingress, que é um recurso do Kubernetes que permite a configuração de regras de roteamento de tráfego para os serviços que estão rodando dentro do cluster.
+## 3. Passo - Configurando o Cloudflare
+Para que iremos utilizar o Cloudflare?
+- Caso sua provedora de internet não libere o IP público(como a minha), será necessário utilizar um serviço de *Tunneling*, para que seja possível acessar os serviços do cluster Kubernetes através de um domínio.
 
-### 2.1 Ingress Controller - Instalação
-Para instalar o Ingress Controller, execute o comando abaixo:
-```bash
-k3s apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.44.0/deploy/static/provider/baremetal/deploy.yaml
-```
+### 3.1 Cloudflare - Faça o Login
+Acesse o site https://dash.cloudflare.com/login e faça o login com a sua conta. Caso não tenha uma conta, crie uma conta gratuita.
 
+### 3.2 Cloudflare - Compre um domínio ou configure um domínio existente
+Para criar o tunnel, será ter um domínio configurado no Cloudflare, caso não tenha um domínio, compre um domínio ou configure um domínio existente no Cloudflare.
+
+### 3.3 Cloudflare - Criando o Tunnel
+#### 3.3.1 Acesse o menu `Tunnels`

@@ -1,0 +1,6 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: internal-tools
+  labels:
+    name: internal-tools

@@ -1,0 +1,9 @@
+- name: Instalando Longhorn
+  hosts: NODES
+  become: true
+  tasks:
+    - name: Instalando Dependencias
+      shell: apt-get update && apt-get install -y open-iscsi nfs-common util-linux
+      register: longhorn
+      ignore_errors: no
+  
