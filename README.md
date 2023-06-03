@@ -279,26 +279,26 @@ Para instalar o Lens, acesso o site https://k8slens.dev/ e baixe a versão para 
 
 ### 2.2 Lens - Configuração
 #### 2.2.1 Iniciando o Lens
-![Lens](/assets/lens/lens.1.png)
+![Lens](/assets/lens/01.png)
 
 #### 2.2.2 Acessando o Catalog
-![Lens](/assets/lens/lens.2.png)
+![Lens](/assets/lens/02.png)
 
 #### 2.2.3 Adicionando o Cluster
-![Lens](/assets/lens/lens.3.png)
+![Lens](/assets/lens/03.png)
 
 #### 2.2.4 Selecionando o tipo do arquivo de configuração
-![Lens](/assets/lens/lens.4.png)
+![Lens](/assets/lens/04.png)
 
 #### 2.2.5 Adicionando a Configuração do Cluster
 Adicione o arquivo de configuração do K3S gerado pelo playbook.
-![Lens](/assets/lens/lens.5.png)
+![Lens](/assets/lens/05.png)
 
 #### 2.2.6 Validando a conexão com o Cluster
-![Lens](/assets/lens/lens.6.png)
+![Lens](/assets/lens/06.png)
 
 #### 2.2.7 Acessando os recursos do Cluster
-![Lens](/assets/lens/lens.7.png)
+![Lens](/assets/lens/07.png)
 
 ## 3 Configurando o Metrics Server
 Para que serve o Metrics Server?
@@ -308,19 +308,19 @@ Basicamente ele coleta métricas de recursos em execução em cada nó e agrega 
 Para instalar o Metrics Server integrado com o Lens, siga os passos abaixo:
 
 #### 3.1.1 Acesse o menu `Catalog`
-![Lens](/assets/metrics-server/metrics-01.png)
+![Lens](/assets/metrics-server/01.png)
 
 #### 3.1.2 Acesse as configurações do Cluster
-![Lens](/assets/metrics-server/metrics-02.png)
+![Lens](/assets/metrics-server/02.png)
 
 #### 3.1.3 Acesse o menu `Builtin Metrics Provider`
-![Lens](/assets/metrics-server/metrics-03.png)
+![Lens](/assets/metrics-server/03.png)
 
 #### 3.1.4 Ative as opções `Enable...` e aplique com `Apply`
-![Lens](/assets/metrics-server/metrics-04.png)
+![Lens](/assets/metrics-server/04.png)
 
 #### 3.1.5 Acesse o menu do Cluster e verifique as métricas
-![Lens](/assets/metrics-server/metrics-05.png)
+![Lens](/assets/metrics-server/05.png)
 ---
 
 
@@ -387,7 +387,7 @@ k3s apply -f kuma.deployment.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: uptime-kuma
+  name: uptime-svc
   namespace: uptime-kuma
 spec:
   selector:
@@ -430,7 +430,83 @@ Para que iremos utilizar o Cloudflare?
 Acesse o site https://dash.cloudflare.com/login e faça o login com a sua conta. Caso não tenha uma conta, crie uma conta gratuita.
 
 ### 5.2 Cloudflare - Compre um domínio ou configure um domínio existente
-Para criar o tunnel, será ter um domínio configurado no Cloudflare, caso não tenha um domínio, compre um domínio ou configure um domínio existente no Cloudflare.
+Valide se você possui um domínio, caso não tenha um domínio, compre um domínio ou configure um domínio existente no Cloudflare.
+
+- Devemos ter um domínio configurado no Cloudflare, como na imagem abaixo:
+
+![Cloudflare](/assets/cloudflare/01.png)
+
 
 ### 5.3 Cloudflare - Criando o Tunnel
-#### 5.3.1 Acesse o menu `Tunnels`
+#### 5.3.1 Acesse o menu `Zero Trust`
+![Cloudflare](/assets/cloudflare/02.png)
+![Cloudflare](/assets/cloudflare/03.png)
+
+#### 5.3.2 Acesse o menu `Access > Tunnels`
+![Cloudflare](/assets/cloudflare/04.png)
+![Cloudflare](/assets/cloudflare/05.png)
+
+#### 5.3.3 Clique em `Create Tunnel`
+- Preencha o nome do Tunnel e clique em `Next`
+![Cloudflare](/assets/cloudflare/06.png)
+![Cloudflare](/assets/cloudflare/07.png)
+
+#### 5.3.4 Configure o Tunnel
+- Salve o Token em algum lugar, posteriormente iremos utilizar.
+- Clique em `Next`
+![Cloudflare](/assets/cloudflare/08.png)
+![Cloudflare](/assets/cloudflare/09.png)
+
+#### 5.3.5 Configure o Tunnel > `Route tunnel`
+- Preencha o `Subdomain` com o nome do seu domínio, no meu caso `kuma`
+- Selecione o `Domain` que você configurou no Cloudflare, no meu caso `nikorasu.work`
+![Cloudflare](/assets/cloudflare/10.png)
+
+- Preencha o Service:
+  - Type: `HTTP`
+  - URL: 
+  ![Cloudflare](/assets/cloudflare/11.png)
+
+- Salve clicando em `Save tunnel`
+  
+
+#### 5.3.6 Criando um `Deployment` para o Tunnel
+```yaml
+apiVersion: apps/v1
+kind: pod
+metadata:
+  name: uptime-kuma-tunnel
+  namespace: uptime-kuma
+
+spec:
+  containers:
+    - name: uptime-kuma-tunnel
+      image: cloudflare/cloudflared:latest
+      imagePullPolicy: Always
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "96m"
+        limits:
+          memory: "256Mi"
+          cpu: "128m"
+      args:
+        - "tunnel"
+        - "--no-autoupdate"
+        - "run"
+        - "--token"
+        - "<SEU-TOKEN>"
+```
+
+- Substitua o `<SEU-TOKEN>` pelo token que você salvou anteriormente.
+
+Aplicando o deployment.
+```bash
+k3s apply -f kuma.service.tunnel.yaml
+```
+
+### 5.4 Cloudflare - Acessando o serviço
+Acesse o endereço que você configurou no Cloudflare, no meu caso [http://kuma.nikorasu.work](http://kuma.nikorasu.work)
+![Cloudflare](/assets/cloudflare/12.png)
+
+E temos como resultado o Uptime Kuma funcionando através do Cloudflare Tunnel, sem a necessidade de abrir portas no roteador e com HTTPS, sendo possível acessar o serviço de qualquer lugar.
