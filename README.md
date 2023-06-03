@@ -195,30 +195,6 @@ source ~/.bashrc
 ```
 ![Alias](/assets/k3s/k3s.alias.gif)
 
-## 8. Passo - Configurando o Metrics Server
-Para que serve o Metrics Server?
-O Metrics Server é um componente do Kubernetes que coleta métricas de uso de recursos de cada nó e pod do cluster, permitindo que o Kubernetes possa escalar os pods de acordo com a necessidade.
-
-### 8.1 Metrics Server - Instalação
-Baixe o arquivo de instalação do Metrics Server:
-```bash
-curl -LO https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-```
-
-### 8.2 Metrics Server - Configuração
-Altere o arquivo de instalação do Metrics Server, adicionando no tipo `Kind:Deployments` as seguintes linhas no spec do container:
-```yaml
-        command:
-        - /metrics-server
-        - --kubelet-insecure-tls
-        - --kubelet-preferred-address-types=InternalIP
-```
-- Antes
-![Metrics Server](/assets/metrics-server/antes.png)
-
-- Depois
-![Metrics Server](/assets/metrics-server/depois.png)
-
 
 ## 8. Passo - `Opcional` Removendo o K3S
 ```bash
@@ -324,9 +300,32 @@ Adicione o arquivo de configuração do K3S gerado pelo playbook.
 #### 2.2.7 Acessando os recursos do Cluster
 ![Lens](/assets/lens/lens.7.png)
 
+## 3 Configurando o Metrics Server
+Para que serve o Metrics Server?
+Basicamente ele coleta métricas de recursos em execução em cada nó e agrega essas métricas e disponibiliza para consulta.
+
+### 3.1 Metrics Server - Instalação
+Para instalar o Metrics Server integrado com o Lens, siga os passos abaixo:
+
+#### 3.1.1 Acesse o menu `Catalog`
+![Lens](/assets/metrics-server/metrics-01.png)
+
+#### 3.1.2 Acesse as configurações do Cluster
+![Lens](/assets/metrics-server/metrics-02.png)
+
+#### 3.1.3 Acesse o menu `Builtin Metrics Provider`
+![Lens](/assets/metrics-server/metrics-03.png)
+
+#### 3.1.4 Ative as opções `Enable...` e aplique com `Apply`
+![Lens](/assets/metrics-server/metrics-04.png)
+
+#### 3.1.5 Acesse o menu do Cluster e verifique as métricas
+![Lens](/assets/metrics-server/metrics-05.png)
+
+
 
 ---
-## 3. Passo - Configurando o Cloudflare
+## 4. Passo - Configurando o Cloudflare
 Para que iremos utilizar o Cloudflare?
 - Caso sua provedora de internet não libere o IP público(como a minha), será necessário utilizar um serviço de *Tunneling*, para que seja possível acessar os serviços do cluster Kubernetes através de um domínio.
 
