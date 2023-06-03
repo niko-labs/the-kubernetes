@@ -321,19 +321,116 @@ Para instalar o Metrics Server integrado com o Lens, siga os passos abaixo:
 
 #### 3.1.5 Acesse o menu do Cluster e verifique as métricas
 ![Lens](/assets/metrics-server/metrics-05.png)
+---
 
+
+## 4. Primeiro Deploy no Kubernetes
+Iremos testar se tudo está funcionando, K3s, MetalLB...
+
+> Iremos utilizar o Uptime Kuma, que é uma ferramenta para monitoramento de serviços, que permite a criação de dashboards para visualização dos serviços.
+
+### 4.1 Uptime Kuma - Namespace
+```yaml
+# uptime-kuma.namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: uptime-kuma
+```
+
+Aplicando o namespace.
+```bash
+k3s apply -f kuma.namespace.yaml
+```
+
+### 4.2 Uptime Kuma - Deployment
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uptime-kuma
+  namespace: uptime-kuma
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uptime-kuma
+  template:
+    metadata:
+      labels:
+        app: uptime-kuma
+    spec:
+      containers:
+        - name: uptime-kuma
+          image: louislam/uptime-kuma:1
+          ports:
+            - containerPort: 3001
+              hostPort: 3001
+              protocol: TCP
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+```
+
+Aplicando o deployment.
+```bash
+k3s apply -f kuma.deployment.yaml
+```
+
+
+### 4.3 Uptime Kuma - Service
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: uptime-kuma
+  namespace: uptime-kuma
+spec:
+  selector:
+    app: uptime-kuma
+  ports:
+    - name: http
+      port: 3001
+      protocol: TCP
+      targetPort: 3001
+  type: LoadBalancer
+  loadBalancerIP: 192.168.3.205
+```
+
+Aplicando o service.
+```bash
+k3s apply -f kuma.service.yaml
+```
+
+### 4.4 Uptime Kuma - Validando o Deploy
+Para validar o deploy, execute o comando abaixo:
+```bash
+k3s get pods -n uptime-kuma
+```
+
+Deve ter um pod com o nome uptime-kuma-xxxxx com o status Running.
+
+### 4.5 Uptime Kuma - Acessando o serviço
+Para acessar o serviço, acesse o endereço http://192.168.3.205:3001
+![Uptime Kuma](/assets/uptimekuma/kuma.png)
+
+E temos como resultado o Uptime Kuma funcionando.
 
 
 ---
-## 4. Passo - Configurando o Cloudflare
+## 5. Passo - Configurando o Cloudflare
 Para que iremos utilizar o Cloudflare?
 - Caso sua provedora de internet não libere o IP público(como a minha), será necessário utilizar um serviço de *Tunneling*, para que seja possível acessar os serviços do cluster Kubernetes através de um domínio.
 
-### 3.1 Cloudflare - Faça o Login
+### 5.1 Cloudflare - Faça o Login
 Acesse o site https://dash.cloudflare.com/login e faça o login com a sua conta. Caso não tenha uma conta, crie uma conta gratuita.
 
-### 3.2 Cloudflare - Compre um domínio ou configure um domínio existente
+### 5.2 Cloudflare - Compre um domínio ou configure um domínio existente
 Para criar o tunnel, será ter um domínio configurado no Cloudflare, caso não tenha um domínio, compre um domínio ou configure um domínio existente no Cloudflare.
 
-### 3.3 Cloudflare - Criando o Tunnel
-#### 3.3.1 Acesse o menu `Tunnels`
+### 5.3 Cloudflare - Criando o Tunnel
+#### 5.3.1 Acesse o menu `Tunnels`
