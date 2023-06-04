@@ -553,7 +553,6 @@ Links que me ajudaram a criar esse tutorial.
 - https://www.youtube.com/
 - https://k3s.io
 - https://kubernetes.io
-- 
 
 ### 8.1 Repositório
 - https://github.com/nicolasmmb/the-kubernetes
