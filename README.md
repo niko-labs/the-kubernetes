@@ -1,4 +1,4 @@
-# Do ZERO o Servidor em Casa com Kubernetes
+# Do ZERO ao Cluster em Casa com Kubernetes
 
 ---
 ## O que iremos utilizar?
@@ -6,7 +6,6 @@
 | :---------: | :------------------------------------------------------------------------------------------------------------------------------------------: |
 |   DietPi    |      [![DietPi](https://img.shields.io/badge/DietPi-000000?style=for-the-badge&logo=raspberry-pi&logoColor=white)](https://dietpi.com/)      |
 |     K3S     |            [![K3S](https://img.shields.io/badge/K3S-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)](https://k3s.io/)            |
-|   Docker    |         [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com/)         |
 |   Ansible   |       [![Ansible](https://img.shields.io/badge/Ansible-EE0000?style=for-the-badge&logo=ansible&logoColor=white)](https://ansible.com/)       |
 |     Git     |             [![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/)             |
 |     ssh     |           [![ssh](https://img.shields.io/badge/ssh-000000?style=for-the-badge&logo=ssh&logoColor=white)](https://www.ssh.com/ssh/)           |
@@ -28,7 +27,7 @@ O ambiente que estarei utilizando como referencia:
 - 1x Computador auxiliar
 
 Schema
-![Kubernetes](/assets/hardwares.schema.png)
+![Kubernetes](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/hardwares.schema.png)
 
 ---
 ## 1. Passo - Instalação do DietPi
@@ -141,7 +140,7 @@ No computador auxiliar criaremos o seguinte playbook de instalação do K3S:
 > ansible-playbook -i hosts.yaml k3s.install.yaml
 > ```
 
-![Install](/assets/k3s/k3s.install.gif)
+![Install](https://github.com/nicolasmmb/the-kubernetes/blob/master/assets/k3s/k3s.install.gif?raw=true)
 
 - **Esse processo pode demorar alguns minutos, pois o K3S irá baixar os binários e instalar os componentes necessários em todos os servidores.**
 
@@ -180,7 +179,7 @@ export KUBECONFIG=$PWD/k3s.cfg.yaml
 # verificando os nodes
 kubectl get nodes
 ```
-![Validando](/assets/k3s/k3s.validando.gif)
+![Validando](https://github.com/nicolasmmb/the-kubernetes/blob/master/assets/k3s/k3s.validando.gif?raw=true)
 > **OBS: Caso os nodes não estejam com o status Ready, verifique os logs do K3S para identificar o problema ou se ainda estão iniciando.**
 
 ## 7. Passo - Adicionando o comando k3s no bashrc ou zshrc
@@ -193,14 +192,14 @@ Após adicionar o alias, execute o comando abaixo para carregar o arquivo de con
 ```bash
 source ~/.bashrc
 ```
-![Alias](/assets/k3s/k3s.alias.gif)
+![Alias](https://github.com/nicolasmmb/the-kubernetes/blob/master/assets/k3s/k3s.alias.gif?raw=true)
 
 
 ## 8. Passo - `Opcional` Removendo o K3S
 ```bash
 ansible-playbook -i hosts.yaml k3s.uninstall.yaml
 ```
-![Uninstall](/assets/k3s/k3s.uninstall.gif)
+![Uninstall](https://github.com/nicolasmmb/the-kubernetes/blob/master/assets/k3s/k3s.uninstall.gif?raw=true)
 
 ---
 # Ajustes Pós Instalação
@@ -214,12 +213,12 @@ Para instalar o MetalLB, execute o comando abaixo:
 ```bash
 k3s apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml
 ```
-![Install](/assets/metallb/metallb.install.gif)
+![Install](https://github.com/nicolasmmb/the-kubernetes/blob/master/assets/metallb/metallb.install.gif?raw=true)
 ### 1.2 MetalLB - Criando o secret para o memberlist
 ```bash
 k3s create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 ```
-![Create](/assets/metallb/metallb.memberlist.secret.gif)
+![Create](https://github.com/nicolasmmb/the-kubernetes/blob/master/assets/metallb/metallb.memberlist.secret.gif?raw=true)
 
 ### 1.3 MetalLB - Criando o IP Pool
 Será criado um IP Pool com o range de IPs de 200 a 220, ou seja, o MetalLB irá utilizar os IPs de 200 a 220 para provisionar os LoadBalancers.
@@ -241,7 +240,7 @@ Aplicando o IP Pool.
 ```bash
 k3s apply -f metallb.IPAddressPools.yaml
 ```
-![IPPool](/assets/metallb/metallb.ippool.gif)
+![IPPool](https://github.com/nicolasmmb/the-kubernetes/blob/master/assets/metallb/metallb.ippool.gif?raw=true)
 
 
 ### 1.5 MetalLB - Criando o Anúncio da Camada L2
@@ -258,7 +257,7 @@ Aplicando o Anuncio da Camada L2.
 ```bash
 k3s apply -f metallb.L2Advertisement.yaml
 ```
-![L2Advertisement](/assets/metallb/metallb.l2advertisement.gif)
+![L2Advertisement](https://github.com/nicolasmmb/the-kubernetes/blob/master/assets/metallb/metallb.l2advertisement.gif?raw=true)
 
 
 ### 1.6 MetalLB - Validando a instalação
@@ -279,26 +278,26 @@ Para instalar o Lens, acesso o site https://k8slens.dev/ e baixe a versão para 
 
 ### 2.2 Lens - Configuração
 #### 2.2.1 Iniciando o Lens
-![Lens](/assets/lens/01.png)
+![Lens](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/lens/01.png)
 
 #### 2.2.2 Acessando o Catalog
-![Lens](/assets/lens/02.png)
+![Lens](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/lens/02.png)
 
 #### 2.2.3 Adicionando o Cluster
-![Lens](/assets/lens/03.png)
+![Lens](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/lens/03.png)
 
 #### 2.2.4 Selecionando o tipo do arquivo de configuração
-![Lens](/assets/lens/04.png)
+![Lens](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/lens/04.png)
 
 #### 2.2.5 Adicionando a Configuração do Cluster
 Adicione o arquivo de configuração do K3S gerado pelo playbook.
-![Lens](/assets/lens/05.png)
+![Lens](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/lens/05.png)
 
 #### 2.2.6 Validando a conexão com o Cluster
-![Lens](/assets/lens/06.png)
+![Lens](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/lens/06.png)
 
 #### 2.2.7 Acessando os recursos do Cluster
-![Lens](/assets/lens/07.png)
+![Lens](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/lens/07.png)
 
 ## 3 Configurando o Metrics Server
 Para que serve o Metrics Server?
@@ -308,19 +307,19 @@ Basicamente ele coleta métricas de recursos em execução em cada nó e agrega 
 Para instalar o Metrics Server integrado com o Lens, siga os passos abaixo:
 
 #### 3.1.1 Acesse o menu `Catalog`
-![Lens](/assets/metrics-server/01.png)
+![Metrics Server](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/metrics-server/01.png)
 
 #### 3.1.2 Acesse as configurações do Cluster
-![Lens](/assets/metrics-server/02.png)
+![Metrics Server](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/metrics-server/02.png)
 
 #### 3.1.3 Acesse o menu `Builtin Metrics Provider`
-![Lens](/assets/metrics-server/03.png)
+![Metrics Server](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/metrics-server/03.png)
 
 #### 3.1.4 Ative as opções `Enable...` e aplique com `Apply`
-![Lens](/assets/metrics-server/04.png)
+![Metrics Server](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/metrics-server/04.png)
 
 #### 3.1.5 Acesse o menu do Cluster e verifique as métricas
-![Lens](/assets/metrics-server/05.png)
+![Metrics Server](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/metrics-server/05.png)
 ---
 
 
@@ -330,8 +329,9 @@ Iremos testar se tudo está funcionando, K3s, MetalLB...
 > Iremos utilizar o Uptime Kuma, que é uma ferramenta para monitoramento de serviços, que permite a criação de dashboards para visualização dos serviços.
 
 ### 4.1 Uptime Kuma - Namespace
+**O que é um namespace?**
+Um namespace é um recurso do Kubernetes que permite a separação de recursos em um cluster, permitindo a organização e separação de recursos.
 ```yaml
-# uptime-kuma.namespace.yaml
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -344,6 +344,8 @@ k3s apply -f kuma.namespace.yaml
 ```
 
 ### 4.2 Uptime Kuma - Deployment
+**O que é um deployment?**
+O `deployment` no Kubernetes é um objeto que gerencia a implantação de uma aplicação em um cluster. Ele garante que o estado esperado da aplicação seja mantido, definindo configurações como o número de réplicas, imagem do container, atualizações e rollbacks. Quando um deployment é criado, ele cria automaticamente um conjunto replicado de pods que executam a aplicação, garantindo a disponibilidade do serviço.
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -381,8 +383,10 @@ Aplicando o deployment.
 k3s apply -f kuma.deployment.yaml
 ```
 
-
 ### 4.3 Uptime Kuma - Service
+**O que é um service?**
+um `service` no Kubernetes é um objeto que define uma política de acesso aos pods de um deployment ou de um conjunto de pods.
+Ele permite que os pods sejam acessados por outros componentes dentro ou fora do cluster, independentemente de suas localizações específicas. O service também garante que o tráfego seja roteado adequadamente para os pods correspondentes, mesmo que os mesmos sejam adicionados ou removidos do cluster.
 ```yaml
 apiVersion: v1
 kind: Service
@@ -416,7 +420,7 @@ Deve ter um pod com o nome uptime-kuma-xxxxx com o status Running.
 
 ### 4.5 Uptime Kuma - Acessando o serviço
 Para acessar o serviço, acesse o endereço http://192.168.3.205:3001
-![Uptime Kuma](/assets/uptimekuma/kuma.png)
+![Uptime Kuma](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/uptimekuma/kuma.png)
 
 E temos como resultado o Uptime Kuma funcionando.
 
@@ -433,39 +437,46 @@ Acesse o site https://dash.cloudflare.com/login e faça o login com a sua conta.
 Valide se você possui um domínio, caso não tenha um domínio, compre um domínio ou configure um domínio existente no Cloudflare.
 
 - Devemos ter um domínio configurado no Cloudflare, como na imagem abaixo:
-
-![Cloudflare](/assets/cloudflare/01.png)
+ 
+![Cloudflare](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/cloudflare/01.png) 
 
 
 ### 5.3 Cloudflare - Criando o Tunnel
 #### 5.3.1 Acesse o menu `Zero Trust`
-![Cloudflare](/assets/cloudflare/02.png)
-![Cloudflare](/assets/cloudflare/03.png)
+![Cloudflare](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/cloudflare/02.png)
+![Cloudflare](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/cloudflare/03.png)
 
 #### 5.3.2 Acesse o menu `Access > Tunnels`
-![Cloudflare](/assets/cloudflare/04.png)
-![Cloudflare](/assets/cloudflare/05.png)
+![Cloudflare](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/cloudflare/04.png)
+![Cloudflare](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/cloudflare/05.png)
+
 
 #### 5.3.3 Clique em `Create Tunnel`
 - Preencha o nome do Tunnel e clique em `Next`
-![Cloudflare](/assets/cloudflare/06.png)
-![Cloudflare](/assets/cloudflare/07.png)
+
+![Cloudflare](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/cloudflare/06.png)
+![Cloudflare](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/cloudflare/07.png)
 
 #### 5.3.4 Configure o Tunnel
 - Salve o Token em algum lugar, posteriormente iremos utilizar.
 - Clique em `Next`
-![Cloudflare](/assets/cloudflare/08.png)
-![Cloudflare](/assets/cloudflare/09.png)
+
+![Cloudflare](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/cloudflare/08.png)
+![Cloudflare](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/cloudflare/09.png)
+
+
 
 #### 5.3.5 Configure o Tunnel > `Route tunnel`
 - Preencha o `Subdomain` com o nome do seu domínio, no meu caso `kuma`
 - Selecione o `Domain` que você configurou no Cloudflare, no meu caso `nikorasu.work`
-![Cloudflare](/assets/cloudflare/10.png)
+
+![Cloudflare](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/cloudflare/10.png)
 
 - Preencha o Service:
   - Type: `HTTP`
   - URL: 
-  ![Cloudflare](/assets/cloudflare/11.png)
+
+![Cloudflare](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/cloudflare/11.png)
 
 - Salve clicando em `Save tunnel`
   
@@ -506,7 +517,43 @@ k3s apply -f kuma.service.tunnel.yaml
 ```
 
 ### 5.4 Cloudflare - Acessando o serviço
-Acesse o endereço que você configurou no Cloudflare, no meu caso [http://kuma.nikorasu.work](http://kuma.nikorasu.work)
-![Cloudflare](/assets/cloudflare/12.png)
+Acesse o endereço que você configurou no Cloudflare, no meu caso 
+![Cloudflare](https://raw.githubusercontent.com/nicolasmmb/the-kubernetes/a55bbc265b41b765ea9b7eda1dd81bb17b784855/assets/cloudflare/12.png)
 
 E temos como resultado o Uptime Kuma funcionando através do Cloudflare Tunnel, sem a necessidade de abrir portas no roteador e com HTTPS, sendo possível acessar o serviço de qualquer lugar.
+
+
+## 6. Considerações Finais
+Parabéns, você chegou até aqui, agora você tem um cluster Kubernetes rodando em sua casa, com um domínio configurado no Cloudflare e com o Uptime Kuma funcionando através do Cloudflare Tunnel e muito mais.
+Já tem a base para fazer o deploy com o Kubernetes, agora é só brincar e aprender mais sobre Kubernetes.
+
+O que você pode fazer agora?
+- Fazer o deploy de uma aplicação no cluster Kubernetes.
+- Ter seu próprio site, blog, etc.
+- Criar um APIs em Python, Go, NodeJS, etc e fazer o deploy no cluster, disponibilizando o acesso externo através do Cloudflare Tunnel.
+- Entender como funciona o Ingress Controller e fazer o deploy de uma aplicação com Ingress Controller.
+- Entender como funciona o HPAs e fazer o deploy de uma aplicação com HPA. (Horizontal Pod Autoscaler)
+- Criar um servidor Local de Minecraft, utilizando o Kubernetes.
+- Criar Um Consummer de Filas, como RabbitMQ, utilizando varios Nodes para maior performance.
+
+
+## 7. Proximos passos
+Coisas que eu quero adicionar nesse tutorial.
+- [ ] Configurar o Longhorn para armazenamento persistente.
+- [ ] Automatizar mais processos da criação do cluster.
+- [ ] Adicionar: Como criar sua própria imagem Docker.
+- [ ] Adicionar: Como criar um servidor de Minecraft com Kubernetes.
+- [ ] Adicionar: Acessando API do Kubernetes com Golang.
+- [ ] Devemos usar banco de dados no Kubernetes?
+
+
+## 8. Referências
+Links que me ajudaram a criar esse tutorial.
+- https://google.com/
+- https://www.youtube.com/
+- https://k3s.io
+- https://kubernetes.io
+- 
+
+### 8.1 Repositório
+- https://github.com/nicolasmmb/the-kubernetes
