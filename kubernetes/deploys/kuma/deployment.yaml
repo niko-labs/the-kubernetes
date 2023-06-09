@@ -1,7 +1,7 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  namespace: internal-tools
+  namespace: tools
   name: kuma-dpl
 spec:
   replicas: 1

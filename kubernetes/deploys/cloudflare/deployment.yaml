@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cloudflare-servers
+  labels:
+    name: cloudflare-servers
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflare-dpl
+  namespace: cloudflare-servers
+  labels:
+    app: geral
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geral
+  template:
+    metadata:
+      labels:
+        app: geral
+    spec:
+      containers:
+        - name: cloudflare
+          image: cloudflare/cloudflared:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "64m"
+            limits:
+              memory: "256Mi"
+              cpu: "128m"
+          args:
+            - "tunnel"
+            - "--no-autoupdate"
+            - "run"
+            - "--token"
+            - "<TOKEN>"

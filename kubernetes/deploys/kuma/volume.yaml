@@ -1,7 +1,7 @@
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  namespace: internal-tools
+  namespace: tools
   name: kuma-pv
 spec:
   capacity:
@@ -18,7 +18,7 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  namespace: internal-tools
+  namespace: tools
   name: kuma-pv-claim
 spec:
   storageClassName: manual

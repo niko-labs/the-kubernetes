@@ -1,0 +1,64 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: games
+  name: minecraft-dpl
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: minecraft-dpl
+  template:
+    metadata:
+      labels:
+        name: minecraft-dpl
+    spec:
+      containers:
+        - name: minecraft-container
+          image: marctv/minecraft-papermc-server:latest
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "2"
+            limits:
+              memory: "2Gi"
+              cpu: "4"
+          volumeMounts:
+            - name: minecraft-pv-claim
+              mountPath: /data
+          env:
+            - name: TZ
+              value: "America/Sao_Paulo"
+            - name: MEMORYSIZE
+              value: "1G"
+            - name: EULA
+              value: "TRUE"
+            - name: PUID
+              value: "9999"
+            - name: PGID
+              value: "9999"
+          ports:
+            - containerPort: 25565
+              name: udp
+              protocol: UDP
+              hostPort: 25565
+            - containerPort: 25565
+              name: tcp
+              protocol: TCP
+              hostPort: 25565
+      volumes:
+        - name: minecraft-pv-claim
+          persistentVolumeClaim:
+            claimName: minecraft-pv-claim
+      terminationGracePeriodSeconds: 10
+      restartPolicy: Always
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - node-minipc
