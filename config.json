@@ -1,0 +1,15 @@
+{
+    "kubernetes": {
+        "namespaces": [
+            {
+                "name": "games"
+            },
+            {
+                "name": "tools"
+            }
+        ],
+        "config_file": {
+            "directory": "/Users/nicolas/Desktop/_DEV_/_K3S_/scripts/ANSIBLE/k3s.cfg.yaml"
+        }
+    }
+}
