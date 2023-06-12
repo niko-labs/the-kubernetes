@@ -1,6 +1,6 @@
 MASTER:
   hosts:
-    rp4-01:
+    rp3-01:
       ansible_host: 192.168.3.102
       ansible_user: root
       ansible_ssh_pass: dietpi
@@ -19,6 +19,17 @@ NODES:
       ansible_user: root
       ansible_ssh_pass: root
       ansible_become: yes
+
+# Longhorn Configuration
+LH_DISKS:
+  hosts:
+    rp4-02:
+      ansible_host: 192.168.3.100
+      ansible_user: root
+      ansible_ssh_pass: dietpi
+      ansible_become: yes
+      longhorn_DISK: sda2
+      longhorn_PARTUUID: "26e58d88-2496-41b4-a691-0e16061c0132"
 
 SERVERS:
   children:

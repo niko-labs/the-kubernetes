@@ -1,69 +1,40 @@
---- # ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: test-pvc
-  namespace: default
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: longhorn-fast
-  resources:
-    requests:
-      storage: 5Gi
----
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: longhorn-fast
-provisioner: driver.longhorn.io
-allowVolumeExpansion: true
-reclaimPolicy: "Delete"
-volumeBindingMode: Immediate
-parameters:
-  numberOfReplicas: "3"
-  staleReplicaTimeout: "30"
-  fsType: "ext4"
-  diskSelector: "ssd"
-  nodeSelector: "ssd"
-
 ---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: kumauptime
-  namespace: default
+  name: kuma-uptime
+  namespace: longhorn-system
   labels:
-    app: kumauptime
+    app: kuma-uptime
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kumauptime
+      app: kuma-uptime
   template:
     metadata:
       labels:
-        app: kumauptime
+        app: kuma-uptime
     spec:
       containers:
-        - name: kumauptime
+        - name: kuma-uptime
           image: louislam/uptime-kuma:1
           resources:
             requests:
               memory: "64Mi"
-              cpu: "64m"
+              cpu: "512m"
             limits:
               memory: "256Mi"
-              cpu: "250m"
+              cpu: "1"
           ports:
             - containerPort: 3001
               protocol: TCP
               name: http
               hostPort: 3001
           volumeMounts:
-            - name: kumauptime
-              mountPath: /data
+            - name: kuma-uptime
+              mountPath: /app/data
       volumes:
-        - name: kumauptime
+        - name: kuma-uptime
           persistentVolumeClaim:
-            claimName: test-pvc
+            claimName: base-pvc

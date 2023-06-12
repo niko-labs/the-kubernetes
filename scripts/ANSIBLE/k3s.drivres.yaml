@@ -1,0 +1,55 @@
+- name: LISTING DISKs
+  hosts: LH_DISKS
+  tasks:
+    - name: -> Alterações No Disco
+      debug:
+        msg: "disk: {{ longhorn_DISK }} - id: {{ longhorn_PARTUUID }}"
+
+    - name: -> Pegando Discos do Servidor
+      shell: |
+        lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT
+      register: logs
+
+    - name: -> Listando Discos do Servidor
+      debug:
+        msg: "{{ logs.stdout_lines }}"
+    
+    - name: -> Pegando ID Do Disco a ser Formatado
+      shell: |
+        blkid -s PARTUUID -o value /dev/{{ longhorn_DISK }}
+      register: logs
+
+    - name: -> Exibindo ID Do Disco a ser Formatado
+      debug:
+        msg: "{{ logs.stdout_lines }}"
+      
+    # - name: -> Limpando Disco
+    #   shell: |
+    #     "wipefs -a /dev/{{ longhorn_DISK }}"
+    #   register: logs
+
+    - name: -> Formatando Disco
+      ansible.builtin.filesystem:
+        fstype: ext4
+        dev: /dev/{{ longhorn_DISK }}
+      register: logs
+      become: true
+
+    - name: -> Montando Disco
+      ansible.posix.mount:
+        path: /storage01
+        src: PARTUUID={{ longhorn_PARTUUID }}
+        fstype: ext4
+        state: mounted
+      register: logs
+      become: true
+
+
+
+
+
+
+
+
+
+
