@@ -6,6 +6,10 @@ metadata:
 
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
   selector:
     matchLabels:
       name: minecraft-dpl
@@ -17,16 +21,15 @@ spec:
       containers:
         - name: minecraft-container
           image: marctv/minecraft-papermc-server:latest
+          tty: true
+          stdin: true
           resources:
             requests:
-              memory: "1Gi"
-              cpu: 500m
+              memory: 1.5Gi
+              cpu: "1"
             limits:
               memory: "2Gi"
-              cpu: "1"
-          volumeMounts:
-            - name: minecraft-pv-claim
-              mountPath: /data
+              cpu: "2"
           env:
             - name: TZ
               value: "America/Sao_Paulo"
@@ -40,25 +43,17 @@ spec:
               value: "9999"
           ports:
             - containerPort: 25565
-              name: udp
-              protocol: UDP
-              hostPort: 25565
-            - containerPort: 25565
               name: tcp
               protocol: TCP
               hostPort: 25565
+          volumeMounts:
+            - name: minecraft-pv-mount
+              mountPath: /data
       volumes:
-        - name: minecraft-pv-claim
+        - name: minecraft-pv-mount
           persistentVolumeClaim:
-            claimName: minecraft-pv-claim
-      terminationGracePeriodSeconds: 10
+            claimName: minecraft-pvc
+
+      terminationGracePeriodSeconds: 5
+
       restartPolicy: Always
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                      - node-minipc
