@@ -13,6 +13,10 @@ VERSION=0.49.0
 DIRECTORY=./frp
 SERVER_PROXY_IP=$SERVER_PROXY_IP
 SERVER_PROXY_PORT=$SERVER_PROXY_PORT
+NAMESPACE=$NAMESPACE
+LOCAL_IP=$LOCAL_IP
+LOCAL_PORT=$LOCAL_PORT
+REMOTE_PORT=$REMOTE_PORT
 WITH_PRIVILEGE=$WITH_PRIVILEGE
 
 URL="https://github.com/fatedier/frp/releases/download/v${VERSION}/frp_${VERSION}_${OS}_${ARCH}.tar.gz"
@@ -21,6 +25,14 @@ URL="https://github.com/fatedier/frp/releases/download/v${VERSION}/frp_${VERSION
 echo "OS: ${OS}"
 echo "ARCH: ${ARCH}"
 echo "VERSION: ${VERSION}"
+echo "DIRECTORY: ${DIRECTORY}"
+echo "WITH_PRIVILEGE: ${WITH_PRIVILEGE}"
+echo "NAMESPACE: ${NAMESPACE}"
+echo "LOCAL_IP: ${LOCAL_IP}"
+echo "LOCAL_PORT: ${LOCAL_PORT}"
+echo "SERVER_PROXY_IP: ${SERVER_PROXY_IP}"
+echo "SERVER_PROXY_PORT: ${SERVER_PROXY_PORT}"
+
 echo "URL: ${URL}"
 
 # CREATE DIRECTORY
@@ -38,25 +50,21 @@ cat > frpc_cfg.ini <<EOF
 server_addr = ${SERVER_PROXY_IP}
 server_port = ${SERVER_PROXY_PORT}
 
-[minecraft]
+[${NAMESPACE}]
 type = tcp
-local_ip = minecraft-svc.games.svc.cluster.local
-local_port = 25565
+local_ip = ${LOCAL_IP}
+local_port = ${LOCAL_PORT}
+remote_port = ${REMOTE_PORT}
 EOF
 
-# CHANGE PERMISSIONS AND START 
-# if exists WITH_PRIVILEGE variable, then run with sudo
-echo "WITH_PRIVILEGE: ${WITH_PRIVILEGE}"
-if [ -z "${WITH_PRIVILEGE}"  ]; then
-  sudo chmod +x ./frpc
-  sudo chmod +x ./frps
-  sudo ./frpc -c ./frpc_cfg.ini
-else
+if [[ -n "${WITH_PRIVILEGE}" && ${WITH_PRIVILEGE} = "N" ]]; then
+  echo "--> no sudo"
   chmod +x ./frpc
   chmod +x ./frps
   ./frpc -c ./frpc_cfg.ini
+else
+  echo "--> with sudo"
+  sudo chmod +x ./frpc
+  sudo chmod +x ./frps
+  sudo ./frpc -c ./frpc_cfg.ini
 fi
-
-
-
-# git config --global http.sslVerify false
