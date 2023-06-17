@@ -41,6 +41,10 @@ spec:
               value: "9999"
             - name: PGID
               value: "9999"
+            - name: SERVER_PROXY_IP
+              value: "168.138.147.157"
+            - name: SERVER_PROXY_PORT
+              value: "25565"
           ports:
             - containerPort: 25565
               name: tcp
