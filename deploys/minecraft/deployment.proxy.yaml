@@ -1,0 +1,112 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: games
+  name: minecraft-dpl
+
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      name: minecraft-dpl
+  template:
+    metadata:
+      labels:
+        name: minecraft-dpl
+    spec:
+      containers:
+        - name: minecraft-container
+          image: itzg/minecraft-server
+          tty: true
+          stdin: true
+          resources:
+            requests:
+              memory: 1.5Gi
+              cpu: "1"
+            limits:
+              memory: "2Gi"
+              # cpu: "2"
+          env:
+            - name: TZ
+              value: "America/Sao_Paulo"
+            - name: MEMORYSIZE
+              value: "1G"
+            - name: MEMORY #itgz
+              value: "1G"
+            - name: EULA
+              value: "TRUE"
+            - name: PUID
+              value: "9999"
+            - name: PGID
+              value: "9999"
+          ports:
+            - containerPort: 25565
+              name: tcp
+              protocol: TCP
+              hostPort: 25565
+          volumeMounts:
+            - name: minecraft-pv-mount
+              mountPath: /data
+      volumes:
+        - name: minecraft-pv-mount
+          persistentVolumeClaim:
+            claimName: minecraft-pvc
+      terminationGracePeriodSeconds: 5
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxy-server
+  namespace: games
+  labels:
+    app: proxy-server
+spec:
+  selector:
+    matchLabels:
+      app: proxy-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: proxy-server
+    spec:
+      containers:
+        - name: proxy-server
+          image: debian:buster-slim
+          tty: true
+          stdin: true
+          resources:
+            requests:
+              cpu: 200m
+              memory: 100Mi
+            limits:
+              cpu: 500m
+              memory: 100Mi
+          ports:
+            - containerPort: 80
+              name: proxy-server
+          env:
+            - name: WITH_PRIVILEGE
+              value: "N"
+            - name: SERVER_PROXY_IP
+              value: "168.138.147.157"
+            - name: SERVER_PROXY_PORT
+              value: "7000"
+            - name: LOCAL_IP
+              value: "minecraft-svc.games.svc.cluster.local"
+            - name: LOCAL_PORT
+              value: "25565"
+            - name: REMOTE_PORT
+              value: "25565"
+            - name: NAMESPACES
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+                
+      restartPolicy: Always

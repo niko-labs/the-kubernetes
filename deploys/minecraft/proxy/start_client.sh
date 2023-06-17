@@ -57,12 +57,15 @@ local_port = ${LOCAL_PORT}
 remote_port = ${REMOTE_PORT}
 EOF
 
-if [[ -n "${WITH_PRIVILEGE}" && ${WITH_PRIVILEGE} = "N" ]]; then
+if [[ ${WITH_PRIVILEGE} == "FALSE" || ${WITH_PRIVILEGE} == "false" || ${WITH_PRIVILEGE} == "" ]]; then
   echo "--> no sudo"
   chmod +x ./frpc
   chmod +x ./frps
   ./frpc -c ./frpc_cfg.ini
-else
+fi
+
+if [[ ${WITH_PRIVILEGE} == "TRUE" || ${WITH_PRIVILEGE} == "true"
+ ]]; then
   echo "--> with sudo"
   sudo chmod +x ./frpc
   sudo chmod +x ./frps
