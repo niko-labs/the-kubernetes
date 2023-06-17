@@ -13,6 +13,7 @@ VERSION=0.49.0
 DIRECTORY=./frp
 SERVER_PROXY_IP=$SERVER_PROXY_IP
 SERVER_PROXY_PORT=$SERVER_PROXY_PORT
+WITH_PRIVILEGE=$WITH_PRIVILEGE
 
 URL="https://github.com/fatedier/frp/releases/download/v${VERSION}/frp_${VERSION}_${OS}_${ARCH}.tar.gz"
 
@@ -39,8 +40,15 @@ server_port = ${SERVER_PROXY_PORT}
 EOF
 
 # CHANGE PERMISSIONS AND START
-chmod +x ./${DIRECTORY}/frps
-chmod +x ./${DIRECTORY}/frpc
+if [ ${WITH_PRIVILEGE} = "true" ]; then
+  sudo chmod +x ./${DIRECTORY}/frps
+  sudo chmod +x ./${DIRECTORY}/frpc
+  sudo ./frpc -c ./frpc_cfg.ini
+else
+  chmod +x ./${DIRECTORY}/frps
+  chmod +x ./${DIRECTORY}/frpc
+  ./frpc -c ./frpc_cfg.ini
+fi
 
 ./frpc -c ./frpc_cfg.ini | exit 1
 
