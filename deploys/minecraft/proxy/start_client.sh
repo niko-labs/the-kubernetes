@@ -42,7 +42,7 @@ EOF
 chmod +x ./${DIRECTORY}/frps
 chmod +x ./${DIRECTORY}/frpc
 
-./frpc -c ./frpc_cfg.ini
+./frpc -c ./frpc_cfg.ini | exit 1
 
 
 git config --global http.sslVerify false
