@@ -37,20 +37,26 @@ cat > frpc_cfg.ini <<EOF
 [common]
 server_addr = ${SERVER_PROXY_IP}
 server_port = ${SERVER_PROXY_PORT}
+
+[minecraft]
+type = tcp
+local_ip = minecraft-svc.games.svc.cluster.local
+local_port = 25565
 EOF
 
-# CHANGE PERMISSIONS AND START
-if [ ${WITH_PRIVILEGE} = "true" ]; then
-  sudo chmod +x ./frps
+# CHANGE PERMISSIONS AND START 
+# if exists WITH_PRIVILEGE variable, then run with sudo
+echo "WITH_PRIVILEGE: ${WITH_PRIVILEGE}"
+if [ -z "${WITH_PRIVILEGE}"  ]; then
   sudo chmod +x ./frpc
+  sudo chmod +x ./frps
   sudo ./frpc -c ./frpc_cfg.ini
 else
-  chmod +x ./frps
   chmod +x ./frpc
+  chmod +x ./frps
   ./frpc -c ./frpc_cfg.ini
 fi
 
-./frpc -c ./frpc_cfg.ini | exit 1
 
 
-git config --global http.sslVerify false
+# git config --global http.sslVerify false
