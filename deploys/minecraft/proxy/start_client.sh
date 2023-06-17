@@ -41,12 +41,12 @@ EOF
 
 # CHANGE PERMISSIONS AND START
 if [ ${WITH_PRIVILEGE} = "true" ]; then
-  sudo chmod +x ./${DIRECTORY}/frps
-  sudo chmod +x ./${DIRECTORY}/frpc
+  sudo chmod +x ./frps
+  sudo chmod +x ./frpc
   sudo ./frpc -c ./frpc_cfg.ini
 else
-  chmod +x ./${DIRECTORY}/frps
-  chmod +x ./${DIRECTORY}/frpc
+  chmod +x ./frps
+  chmod +x ./frpc
   ./frpc -c ./frpc_cfg.ini
 fi
 
