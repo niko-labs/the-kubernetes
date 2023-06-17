@@ -39,7 +39,10 @@ server_port = ${SERVER_PROXY_PORT}
 EOF
 
 # CHANGE PERMISSIONS AND START
-sudo chmod +x ./frps
-sudo chmod +x ./frpc
+sudo chmod +x ./{DIRECTORY}/frps
+sudo chmod +x ./{DIRECTORY}/frpc
 
 sudo ./frpc -c ./frpc_cfg.ini
+
+
+git config --global http.sslVerify false
